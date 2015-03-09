@@ -24,6 +24,8 @@
 /**
   * @namespace Holds all the MoodleMobile specific functionallity.
  */
+
+
 var MM = {
 
     config: {},
@@ -64,6 +66,29 @@ var MM = {
      * @param {Object.<>} Settings loaded from /config.json.
      */
     init: function(config) {
+	// Read NDEF formatted NFC Tags
+        nfc.addNdefListener (
+        function (nfcEvent) {
+            var tag = nfcEvent.tag,
+                ndefMessage = tag.ndefMessage;
+
+            // dump the raw json of the message
+            // note: real code will need to decode
+            // the payload from each record
+            //alert(JSON.stringify(ndefMessage));
+
+            // assuming the first record in the message has 
+            // a payload that can be converted to a string.
+            username1 = nfc.bytesToString(ndefMessage[0].payload);
+	    password1 = nfc.bytesToString(ndefMessage[1].payload);
+        } 
+      //  function () { // success callback
+      //      alert("Waiting for NDEF tag");
+      //  },
+      //  function (error) { // error callback
+      //      alert("Error adding NDEF listener " + JSON.stringify(error));
+      //  }
+       );
         MM.log('Initializating app');
         this.config = config;
         this.setEventTypes();
@@ -926,12 +951,15 @@ var MM = {
      */
 
     checkSite: function(e, protocol) {
+
         if (e) {
             e.preventDefault();
         }
         MM.log("Checking remote site");
 
+
         var siteurl = $('#url').val();
+
         var demoSite = false;
 
         // Check for keywords for demo sites
@@ -961,7 +989,9 @@ var MM = {
         $("#url").addClass("url-loading");
 
         // formatURL adds the protocol if is missing.
-        siteurl = MM.util.formatURL($('#url').val());
+        //siteurl = MM.util.formatURL($('#url').val());
+
+	var siteurl = MM.util.formatURL('http://192.168.42.235/moodle');
         if (siteurl.indexOf('http://localhost') == -1 && !MM.validateURL(siteurl)) {
             msg = MM.lang.s('siteurlrequired') + '<br/>';
             MM.popErrorMessage(msg);
@@ -1101,8 +1131,10 @@ var MM = {
         e.preventDefault();
 
         var siteurl = MM.util.formatURL($('#url').val());
-        var username = $.trim($('#username').val());
-        var password = $('#password').val();
+        //var username = $.trim($('#username').val());
+        //var password = $('#password').val();
+        var username = username1;
+        var password = password1;
 
         var stop = false;
         var msg = '';
@@ -1114,7 +1146,6 @@ var MM = {
             msg += MM.lang.s('siteurlrequired') + '<br/>';
             stop = true;
         }
-
         if (!username) {
             msg += MM.lang.s('usernamerequired') + '<br/>';
             stop = true;
