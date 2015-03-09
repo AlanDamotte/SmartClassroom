@@ -29,7 +29,7 @@ require_once(dirname(dirname(__FILE__)) . '/config.php');
 require_once($CFG->libdir.'/authlib.php');
 
 $username = required_param('username', PARAM_USERNAME);
-$idtag = required_param('idtag', PARAM_RAW);
+//$idtag = required_param('idtag', PARAM_RAW); //At first, we only connect by using username in order to ease mobile client development
 $serviceshortname  = required_param('service',  PARAM_ALPHANUMEXT);
 
 echo $OUTPUT->header();
