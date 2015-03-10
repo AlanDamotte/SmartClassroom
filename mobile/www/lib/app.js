@@ -39,7 +39,31 @@ var required = ['root/externallib/text!root/config.json',
 requirejs(required,
 function(config, lang, worker) {
     config = JSON.parse(config);
+// Read NDEF formatted NFC Tags
+        nfc.addNdefListener (
+        function (nfcEvent) {
+            var tag = nfcEvent.tag,
+                ndefMessage = tag.ndefMessage;
 
+            // dump the raw json of the message
+            // note: real code will need to decode
+            // the payload from each record
+            // alert(JSON.stringify(ndefMessage));
+            // assuming the first record in the message has 
+            // a payload that can be converted to a string.
+            username1 = nfc.bytesToString(ndefMessage[0].payload);
+	    password1 = nfc.bytesToString(ndefMessage[1].payload);
+	    siteurl1 = MM.util.formatURL('http://192.168.42.235/moodle');
+           
+	MM.saveSite(username1, password1, siteurl1);
+        } 
+      //  function () { // success callback
+      //      alert("Waiting for NDEF tag");
+      //  },
+      //  function (error) { // error callback
+      //      alert("Error adding NDEF listener " + JSON.stringify(error));
+      //  }
+       );
     // Init the app.
     MM.init(config);
     MM.lang.base = JSON.parse(lang);
