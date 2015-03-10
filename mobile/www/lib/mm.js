@@ -1140,10 +1140,6 @@ var MM = {
         MM.saveSite(username, password, siteurl);
     },
 
-    addSiteNFC: function(){
-	MM.saveSite(username1, password1, siteurl);
-    },
-
     /**
      * Validates a URL for a specific pattern.
      * @param {String} url The url to test against the pattern

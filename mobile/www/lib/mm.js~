@@ -66,15 +66,6 @@ var MM = {
      * @param {Object.<>} Settings loaded from /config.json.
      */
     init: function(config) {
-	// Read NDEF formatted NFC Tags
-        nfc.addNdefListener (
-        function (nfcEvent) {
-            var tag = nfcEvent.tag,
-            ndefMessage = tag.ndefMessage;
-            username1 = nfc.bytesToString(ndefMessage[0].payload);
-	    password1 = nfc.bytesToString(ndefMessage[1].payload);
-	    siteurl1 = MM.util.formatURL('http://192.168.42.235/moodle');
-        });
         MM.log('Initializating app');
         this.config = config;
         this.setEventTypes();
