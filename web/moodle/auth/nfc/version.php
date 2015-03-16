@@ -25,5 +25,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2015031600;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2015031600;        // Requires this Moodle version
+$plugin->requires  = 2014110400;        // Requires this Moodle version
 $plugin->component = 'auth_nfc';     // Full name of the plugin (used for diagnostics)
