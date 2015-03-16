@@ -952,7 +952,7 @@ var MM = {
 
         // Load a demo site and exits this checking function.
         if (demoSite) {
-            MM.saveSite(username, password, siteurl);
+            MM.saveSite(username, password, siteurl, null);
             return;
         }
 
@@ -968,7 +968,7 @@ var MM = {
         // formatURL adds the protocol if is missing.
         //siteurl = MM.util.formatURL($('#url').val());
 
-	var siteurl = siteurl1;
+	var siteurl = MM.util.formatURL('http://192.168.42.40/moodle');;
         if (siteurl.indexOf('http://localhost') == -1 && !MM.validateURL(siteurl)) {
             msg = MM.lang.s('siteurlrequired') + '<br/>';
             MM.popErrorMessage(msg);
@@ -1108,10 +1108,8 @@ var MM = {
         e.preventDefault();
 
         var siteurl = MM.util.formatURL($('#url').val());
-        //var username = $.trim($('#username').val());
-        //var password = $('#password').val();
-        var username = username1;
-        var password = password1;
+        var username = $.trim($('#username').val());
+        var password = $('#password').val();
 
         var stop = false;
         var msg = '';
@@ -1137,7 +1135,7 @@ var MM = {
             return;
         }
 
-        MM.saveSite(username, password, siteurl);
+        MM.saveSite(username, password, siteurl, null);
     },
 
     /**
@@ -1223,9 +1221,8 @@ var MM = {
      * @param {bool}   retry We are retrying with a prefixed URL.
      * @return {boolean} Allways returns false
      */
-    saveSite: function(username, password, siteurl, retry) {
+    saveSite: function(username, password, siteurl, nfc, retry) {
         retry = retry || false;
-
         MM.showModalLoading(MM.lang.s("authenticating"));
         var loginURL = siteurl + '/login/token.php';
         MM.siteurl = siteurl;
@@ -1238,10 +1235,13 @@ var MM = {
             data:{
                 username: username,
                 password: password,
+		nfc: nfc,
                 service:  service
             },
             dataType:"json",
             success:function(json) {
+		
+	    alert(nfc);
                 if (typeof(json.token) != 'undefined') {
                     // Save the token, and load the site.
                     MM._saveToken(json.token);
@@ -1256,7 +1256,7 @@ var MM = {
                             siteurl = siteurl.replace("http://", "http://www.");
                             $("#url").val(siteurl);
 
-                            MM.saveSite(username, password, siteurl, true);
+                            MM.saveSite(username, password, siteurl, null, true);
                             return;
                         } else {
                             error = json.error;
