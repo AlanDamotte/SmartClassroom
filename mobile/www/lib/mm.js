@@ -952,7 +952,7 @@ var MM = {
 
         // Load a demo site and exits this checking function.
         if (demoSite) {
-            MM.saveSite(username, password, siteurl, null);
+            MM.saveSite(username, password, siteurl);
             return;
         }
 
@@ -1135,7 +1135,7 @@ var MM = {
             return;
         }
 
-        MM.saveSite(username, password, siteurl, null);
+        MM.saveSite(username, password, siteurl);
     },
 
     /**
@@ -1221,7 +1221,7 @@ var MM = {
      * @param {bool}   retry We are retrying with a prefixed URL.
      * @return {boolean} Allways returns false
      */
-    saveSite: function(username, password, siteurl, nfc, retry) {
+    saveSite: function(username, password, siteurl, retry) {
         retry = retry || false;
         MM.showModalLoading(MM.lang.s("authenticating"));
         var loginURL = siteurl + '/login/token.php';
@@ -1235,13 +1235,10 @@ var MM = {
             data:{
                 username: username,
                 password: password,
-		nfc: nfc,
                 service:  service
             },
             dataType:"json",
             success:function(json) {
-		
-	    alert(nfc);
                 if (typeof(json.token) != 'undefined') {
                     // Save the token, and load the site.
                     MM._saveToken(json.token);
@@ -1256,7 +1253,7 @@ var MM = {
                             siteurl = siteurl.replace("http://", "http://www.");
                             $("#url").val(siteurl);
 
-                            MM.saveSite(username, password, siteurl, null, true);
+                            MM.saveSite(username, password, siteurl, true);
                             return;
                         } else {
                             error = json.error;

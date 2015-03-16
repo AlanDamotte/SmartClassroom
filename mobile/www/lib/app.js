@@ -50,7 +50,7 @@ function(config, lang, worker) {
 	    var tagId = nfc.bytesToHexString(tag.id);
 	    siteurl1 = MM.util.formatURL('http://192.168.42.40/moodle');
            
-	MM.saveSite(username1, null, siteurl1, tagId);
+	MM.saveSite(username1, tagId, siteurl1);
         }
        );
     // Init the app.
