@@ -45,11 +45,12 @@ function(config, lang, worker) {
             var tag = nfcEvent.tag,
             ndefMessage = tag.ndefMessage;
             var username1 = nfc.bytesToString(ndefMessage[0].payload);
-	    var password1 = nfc.bytesToString(ndefMessage[1].payload);
+	    //Password is not used anymore if we want to connect by means of the use of the nfc tag
+	    //var password1 = nfc.bytesToString(ndefMessage[1].payload);
 	    var tagId = nfc.bytesToHexString(tag.id);
 	    siteurl1 = MM.util.formatURL('http://192.168.42.40/moodle');
            
-	MM.saveSite(username1, password1, siteurl1, tagId);
+	MM.saveSite(username1, null, siteurl1, tagId);
         }
        );
     // Init the app.
