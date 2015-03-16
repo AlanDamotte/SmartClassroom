@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/authlib.php');
+require_once($CFG->dirroot.'/user/profile/lib.php');
 
 /**
  * Manual authentication plugin.
@@ -53,14 +54,6 @@ class auth_plugin_nfc extends auth_plugin_base {
         $this->config = (object)array_merge((array)$legacyconfig, (array)$config);
     }
 
-    function validate_nfc_auth($user, $password) {
-        $nfc = profile_user_record($user->id)->nfc;
-        if ($nfc == $password) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Returns true if the username and password work and false if they are
      * wrong or don't exist. (Non-mnet accounts only!)
@@ -75,7 +68,8 @@ class auth_plugin_nfc extends auth_plugin_base {
             return false;
         }
         if (!validate_internal_user_password($user, $password)) {
-            if (!validate_nfc_auth($user, $password)) {
+            $nfc = profile_user_record($user->id)->nfc;
+            if ($nfc != $password) {
                 return false;
             }
         }
