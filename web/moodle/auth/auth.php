@@ -31,26 +31,34 @@ require_once($CFG->libdir.'/authlib.php');
  * Manual authentication plugin.
  *
  * @package    auth
- * @subpackage manual
+ * @subpackage nfc
  * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class auth_plugin_manual extends auth_plugin_base {
+class auth_plugin_nfc extends auth_plugin_base {
 
     /**
      * The name of the component. Used by the configuration.
      */
-    const COMPONENT_NAME = 'auth_manual';
-    const LEGACY_COMPONENT_NAME = 'auth/manual';
+    const COMPONENT_NAME = 'auth_nfc';
+    const LEGACY_COMPONENT_NAME = 'auth/nfc';
 
     /**
      * Constructor.
      */
-    function auth_plugin_manual() {
-        $this->authtype = 'manual';
+    function auth_plugin_nfc() {
+        $this->authtype = 'nfc';
         $config = get_config(self::COMPONENT_NAME);
         $legacyconfig = get_config(self::LEGACY_COMPONENT_NAME);
         $this->config = (object)array_merge((array)$legacyconfig, (array)$config);
+    }
+
+    function validate_nfc_auth($user, $password) {
+        $nfc = profile_user_record($user->id)->nfc;
+        if ($nfc == $password) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -67,7 +75,9 @@ class auth_plugin_manual extends auth_plugin_base {
             return false;
         }
         if (!validate_internal_user_password($user, $password)) {
-            return false;
+            if (!validate_nfc_auth($user, $password)) {
+                return false;
+            }
         }
         if ($password === 'changeme') {
             // force the change - this is deprecated and it makes sense only for manual auth,

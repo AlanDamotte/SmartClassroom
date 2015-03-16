@@ -17,13 +17,13 @@
 /**
  * Manual authentication plugin version information
  *
- * @package    auth_manual
- * @copyright  2011 Petr Skoda (http://skodak.org)
+ * @package    auth_nfc
+ * @copyright  2015 Polytech'Grenoble
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014111000;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014110400;        // Requires this Moodle version
-$plugin->component = 'auth_manual';     // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2015031600;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2015031600;        // Requires this Moodle version
+$plugin->component = 'auth_nfc';     // Full name of the plugin (used for diagnostics)
