@@ -1222,6 +1222,10 @@ var MM = {
      * @return {boolean} Allways returns false
      */
     saveSite: function(username, password, siteurl, retry) {
+	//We will need to keep username and siteurl for later
+	username1 = username;
+	url1 = siteurl;
+	//---------------------------------------------------
         retry = retry || false;
         MM.showModalLoading(MM.lang.s("authenticating"));
         var loginURL = siteurl + '/login/token.php';
@@ -2532,12 +2536,18 @@ var MM = {
      *
      */
     logoutUser: function() {
-        MM.setConfig("current_site", null);
+	//We dont want to keep the site when login because we suppose that other users can want to log their accounts
+	//This is used to get the current site id and delete it 
+	id = hex_md5(url1 + username1);
+	MM.settings.deleteSite(id);
+        /*MM.setConfig("current_site", null);
         MM.setConfig("current_token", null);
         MM.config.current_site = null;
         MM.config.current_token = null;
-        MM.site = null;
+        MM.site = null;*/
         location.href = "index.html";
+
+	
     },
 
     /**
