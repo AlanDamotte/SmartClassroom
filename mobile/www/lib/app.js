@@ -48,6 +48,7 @@ function(config, lang, worker) {
 	    //Password is not used anymore if we want to connect by means of the use of the nfc tag
 	    //var password1 = nfc.bytesToString(ndefMessage[1].payload);
 	    var tagId = nfc.bytesToHexString(tag.id);
+	    //alert(tagId);
 	    siteurl1 = MM.util.formatURL('http://192.168.42.40/moodle');
            
 	MM.saveSite(username1, tagId, siteurl1);
