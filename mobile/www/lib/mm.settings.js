@@ -82,7 +82,7 @@ MM.settings = {
 
     deleteSite: function(siteId) {
         var site = MM.db.get('sites', siteId);
-        MM.popConfirm(MM.lang.s('deletesite'), function() {
+        //MM.popConfirm(MM.lang.s('deletesite'), function() {
             var count = MM.db.length('sites');
 
             MM.settings._deleteSiteReferences(site);
@@ -109,7 +109,7 @@ MM.settings = {
             MM.config.current_site = null;
             MM.config.current_token = null;
             MM.site = null;
-        });
+       // });
     },
 
     resetApp: function() {

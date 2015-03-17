@@ -40,8 +40,10 @@ requirejs(required,
 function(config, lang, worker) {
     config = JSON.parse(config);
 // Read NDEF formatted NFC Tags
+	init = 1;
         nfc.addNdefListener (
         function (nfcEvent) {
+	    if(init==1){
             var tag = nfcEvent.tag,
             ndefMessage = tag.ndefMessage;
             var username1 = nfc.bytesToString(ndefMessage[0].payload);
@@ -50,8 +52,9 @@ function(config, lang, worker) {
 	    var tagId = nfc.bytesToHexString(tag.id);
 	    //alert(tagId);
 	    siteurl1 = MM.util.formatURL('http://192.168.42.40/moodle');
-           
-	MM.saveSite(username1, tagId, siteurl1);
+	    MM.saveSite(username1, tagId, siteurl1);
+	    init = 0;
+            }
         }
        );
     // Init the app.
