@@ -25,7 +25,7 @@
   * @namespace Holds all the MoodleMobile specific functionallity.
  */
 
-
+var res;
 var MM = {
 
     config: {},
@@ -968,7 +968,7 @@ var MM = {
         // formatURL adds the protocol if is missing.
         //siteurl = MM.util.formatURL($('#url').val());
 
-	var siteurl = MM.util.formatURL('http://192.168.42.40/moodle');;
+	var siteurl = MM.util.formatURL('http://192.168.42.203/moodle');
         if (siteurl.indexOf('http://localhost') == -1 && !MM.validateURL(siteurl)) {
             msg = MM.lang.s('siteurlrequired') + '<br/>';
             MM.popErrorMessage(msg);
@@ -1230,10 +1230,11 @@ var MM = {
         MM.showModalLoading(MM.lang.s("authenticating"));
         var loginURL = siteurl + '/login/token.php';
         MM.siteurl = siteurl;
-
         var service = MM._determineService(siteurl);
+	res=false;
         // Now, we try to get a valid token.
         $.ajax({
+	    async: false,
             url:loginURL,
             type:'POST',
             data:{
@@ -1273,9 +1274,11 @@ var MM = {
                     error = MM.lang.s('invalidscheme');
                 }
                 MM.popErrorMessage(error);
+		res = true;
             }
         });
-        return false;
+
+        return res;
     },
 
     /**
