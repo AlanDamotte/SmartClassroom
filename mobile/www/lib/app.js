@@ -51,7 +51,7 @@ function(config, lang, worker) {
 	    //var password1 = nfc.bytesToString(ndefMessage[1].payload);
 	    var tagId = nfc.bytesToHexString(tag.id);
 	    //alert(tagId);
-	    siteurl1 = MM.util.formatURL('http://192.168.42.203/moodle');
+	    siteurl1 = nfc.bytesToString(ndefMessage[1].payload);
 	
 	    if (!MM.saveSite(username1, tagId, siteurl1)){
 	    	init = 0;

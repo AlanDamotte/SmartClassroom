@@ -516,13 +516,14 @@ hr {
   }
 }
 
-#manage-accounts {
+#manage-accounts, #app-dialog {
   .accounts {
     display: block;
     background-color: #fff;
     border-radius: 4px;
     padding: 10px;
     margin-bottom: 15px;
+    min-height: 120px;
   }
   .account-details {
     color: @textColor;
@@ -1048,6 +1049,94 @@ hr {
   &.forum-discussion {
     .indent {
       border-top: 15px solid #eee;
+    }
+  }
+}
+
+//-----Assignment-----
+.path-mod-assign {
+  .intro {
+    padding: 10px;
+    margin-left: 4px;
+  }
+  .info {
+    padding: 10px 10px 10px 0;
+    border-top: 1px solid #eee;
+    margin-left: 14px;
+    p {
+      display: table-row;
+    }
+    span {
+      display: table-cell;
+      padding-right: 20px;
+      text-align: right;
+    }
+    time {
+      font-size: .9375rem;
+      display: table-cell;
+    }
+  }
+  .post {
+    padding-top: 10px;
+    border-bottom: 15px solid #eee;
+  }
+  .header {
+    line-height: 20px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+  }
+  .user-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    float: left;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .author-name {
+    display: block;
+  }
+  time {
+    font-size: .75rem;
+    color: #888;
+    display: inline;
+  }
+  .status {
+    float: right;
+  }
+  .content {
+    padding: 0 10px 10px;
+    margin-left: 50px;
+    clear: right;
+    border-top: 1px solid #eee;
+    p {
+      padding-top: 10px;
+    }
+  }
+  .attachments {
+    .attachment {
+      padding-top: 10px;
+    }
+    .content-name {
+      a {
+        padding: 0;
+        line-height: 20px;
+        margin-top: 2px;
+        color: @textColor;
+      }
+    }
+    .content-actions {
+      width: 40px;
+      padding: 0;
+    }
+  }
+  .paging-bar {
+    padding: 6px 10px;
+    a,
+    .current {
+      display: inline-block;
+      padding: 2px 6px;
+      margin: 4px;
     }
   }
 }
@@ -1952,5 +2041,44 @@ div.jqi {
   }
   .leveleven {
     background-color: #fff;
+  }
+}
+/* - Upload file (Android)
+-------------------------------------------------------------------------- */
+.uploadinstructions {
+   padding: 10px;
+}
+.uploadfilecontainer {
+  position: relative;
+}
+.uploadfilecontainer input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  opacity: 0;
+  outline: none;
+}
+/* - Full screen dialog
+-------------------------------------------------------------------------- */
+#app-dialog.full-screen-dialog {
+  >div {
+    width: 100% !important;
+    height: 100%;
+    margin-top: 0 !important;
+    background-color: #fa8f1c;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+  }
+  .modalHeader {
+    display: none;
+  }
+  .modalContent {
+    color: #fff;
+  }
+  .modalFooter {
+    border-top: 0px;
   }
 }

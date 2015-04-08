@@ -17,7 +17,7 @@ define(templates, function (eventsTpl, eventTpl) {
 
         storage: {
             "event": {type: "model"},
-            "eventsDisabled": {type: "collection", model: "event"}
+            "events": {type: "collection", model: "event"}
         },
 
         routes: [
@@ -36,6 +36,14 @@ define(templates, function (eventsTpl, eventTpl) {
          * @return {bool} True if the plugin is visible for the site and device
          */
         isPluginVisible: function() {
+
+            // Local notification click handler.
+            if (window.plugin && window.plugin.notification && window.plugin.notification.local) {
+                window.plugin.notification.local.onclick = function (id, state, json) {
+                    location.href = "#events/7";
+                };
+            }
+
             return MM.util.wsAvailable('core_calendar_get_calendar_events') ||
                     MM.util.wsAvailable('local_mobile_core_calendar_get_calendar_events');
         },
@@ -54,12 +62,12 @@ define(templates, function (eventsTpl, eventTpl) {
 
                 d = new Date(event.timestart * 1000);
                 event.startdate = d.toLocaleDateString();
-                event.starttime = d.toLocaleTimeString(MM.lang.current, {hour: '2-digit', minute:'2-digit'});
+                event.starttime = MM.util.toLocaleTimeString(d, MM.lang.current, {hour: '2-digit', minute:'2-digit'});
 
                 if (event.timeduration) {
                     d = new Date((event.timestart + event.timeduration) * 1000);
                     event.enddate = d.toLocaleDateString();
-                    event.endtime = d.toLocaleTimeString(MM.lang.current, {hour: '2-digit', minute:'2-digit'});
+                    event.endtime = MM.util.toLocaleTimeString(d, MM.lang.current, {hour: '2-digit', minute:'2-digit'});
                 } else {
                     event.enddate = 0;
                     event.endtime = 0;
@@ -148,15 +156,9 @@ define(templates, function (eventsTpl, eventTpl) {
                 }
 
                 var localEventId = MM.plugins.events._getLocalEventUniqueId(fullEvent);
-                var disabled = MM.db.get("eventsDisabled", localEventId);
-                var checked = "";
-                if (disabled) {
-                    checked = "checked";
-                }
 
                 var tpl = {
-                    "event": fullEvent,
-                    "checked": checked
+                    "event": fullEvent
                 };
                 var html = MM.tpl.render(MM.plugins.events.templates.event.html, tpl);
 
@@ -165,26 +167,23 @@ define(templates, function (eventsTpl, eventTpl) {
 
                 MM.panels.show('right', html, {title: title});
 
-                $("#disable-event").bind("change", function() {
+                var notificationTime = 60; // Default time.
+                var event = MM.db.get("events", localEventId);
+                if (event) {
+                    notificationTime = event.get("notification");
+                }
+                $("#notification-time").val(notificationTime);
+
+                $("#notification-time").bind("change", function() {
 
                     if (window.plugin && window.plugin.notification && window.plugin.notification.local) {
-                        var disable = $(this).is(':checked');
+                        var disable = parseInt($(this).val(), 10) === 0;
                         if (disable) {
                             window.plugin.notification.local.cancel(localEventId);
-                            MM.db.insert("eventsDisabled", {id: localEventId});
+                            MM.plugins.events._setEnabled(localEventId, false);
                         } else {
-                            var d = new Date(fullEvent.timestart * 1000);
-
-                            window.plugin.notification.local.add(
-                                {
-                                    id: localEventId,
-                                    date: d,
-                                    title: MM.lang.s("events"),
-                                    message: fullEvent.name,
-                                    badge: 1
-                                }
-                            );
-                            MM.db.remove("eventsDisabled", localEventId);
+                            fullEvent.notification = parseInt($(this).val(), 10);
+                            MM.plugins.events._createLocalEvent(fullEvent);
                         }
                     }
                 });
@@ -204,6 +203,11 @@ define(templates, function (eventsTpl, eventTpl) {
             var courses = MM.db.where("courses", {siteid: MM.config.current_site.id});
             $.each(courses, function(index, course) {
                 params["events[courseids][" + index + "]"] = course.get("courseid");
+            });
+
+            var groups = MM.db.where("usergroups", {site: MM.config.current_site.id, userid: MM.config.current_site.userid});
+            $.each(groups, function(index, group) {
+                params["events[groupids][" + index + "]"] = group.get("groupid");
             });
 
             var wsFunction = "core_calendar_get_calendar_events";
@@ -245,6 +249,17 @@ define(templates, function (eventsTpl, eventTpl) {
             }
 
             if (window.plugin && window.plugin.notification && window.plugin.notification.local) {
+                // Cancell all to resync.
+                var existingEvents = {};
+                var events = MM.db.where("events", {'site': MM.config.current_site.id});
+                _.each(events, function(e) {
+                    if (e.get("enabled")) {
+                        existingEvents[e.get("id")] = e;
+                        MM.db.remove("events", e.get("id"));
+                        window.plugin.notification.local.cancel(e.get("id"));
+                    }
+                });
+
                 MM.plugins.events._getEvents(
                 30,
                 {
@@ -256,21 +271,14 @@ define(templates, function (eventsTpl, eventTpl) {
                         _.each(events.events, function(event) {
                             var eventId = MM.plugins.events._getLocalEventUniqueId(event);
 
-                            var disabled = MM.db.get("eventsDisabled", eventId);
-
-                            if (!disabled) {
-                                // We insert the event allways, if already exists it will be updated.
-                                var d = new Date(event.timestart * 1000);
-
-                                window.plugin.notification.local.add(
-                                    {
-                                        id: eventId,
-                                        date: d,
-                                        title: MM.lang.s("events"),
-                                        message: event.name,
-                                        badge: 1
-                                    }
-                                );
+                            if (!MM.plugins.events._eventIsDisabled(eventId)) {
+                                if (typeof existingEvents[eventId] != "undefined") {
+                                    event.notification = parseInt(existingEvents[eventId].get("notification"), 10);
+                                } else {
+                                    // 60 minutes of pre-notification.
+                                    event.notification = 60;
+                                }
+                                MM.plugins.events._createLocalEvent(event);
                             }
                         });
                     }
@@ -278,6 +286,58 @@ define(templates, function (eventsTpl, eventTpl) {
                 function() {}
             );
             }
+        },
+
+        _eventIsDisabled: function(localEventId) {
+            var event = MM.db.get("events", localEventId);
+
+            if (!event) {
+                return false;
+            }
+
+            if (event.get("enabled")) {
+                return false;
+            }
+            return true;
+        },
+
+        _setEnabled: function(localEventId, status) {
+            var event = MM.db.get("events", localEventId);
+            if (event) {
+                event.set("enabled", status);
+                if (!status) {
+                    event.set("notification", 0);
+                }
+                MM.db.insert("events", event);
+            }
+        },
+
+        _createLocalEvent: function(event) {
+            var eventId = MM.plugins.events._getLocalEventUniqueId(event);
+            event.notification = event.notification || 60;
+
+            // We insert the event allways, if already exists it will be updated.
+            // We discount the notification time in minutes.
+            var d = new Date((event.timestart - (event.notification * 60)) * 1000);
+            var realDate = new Date(event.timestart * 1000);
+
+            window.plugin.notification.local.add(
+                {
+                    id: eventId,
+                    date: d,
+                    title: event.name,
+                    message: realDate.toLocaleString(),
+                    badge: 1
+                }
+            );
+            MM.db.insert("events",
+                {
+                    id: eventId,
+                    enabled: true,
+                    notification: event.notification
+                }
+            );
+
         },
 
         templates: {
