@@ -968,7 +968,6 @@ var MM = {
         // formatURL adds the protocol if is missing.
         //siteurl = MM.util.formatURL($('#url').val());
 
-	var siteurl = MM.util.formatURL('http://192.168.42.203/moodle');
         if (siteurl.indexOf('http://localhost') == -1 && !MM.validateURL(siteurl)) {
             msg = MM.lang.s('siteurlrequired') + '<br/>';
             MM.popErrorMessage(msg);
